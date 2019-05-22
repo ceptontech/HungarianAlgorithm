@@ -1,3 +1,3 @@
 #include <Eigen/Dense>
 
-void hungarian(Eigen::MatrixXd& m, Eigen::MatrixXd& result);
+Eigen::MatrixXd hungarian(Eigen::MatrixXd& m);

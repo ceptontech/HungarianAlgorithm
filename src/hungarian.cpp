@@ -1,3 +1,5 @@
+#include <hungarian.h>
+
 #include <cstdlib>
 #include <cmath>
 #include <ctime>
@@ -89,7 +91,25 @@ void swapStarsAndPrimes(int i, int j, MatrixXd& stars, MatrixXd& primes) {
  * implementation of the Hungarian matching algorithm
  * referenced from: http://csclab.murraystate.edu/bob.pilgrim/445/munkres.html
  */
-void hungarian(MatrixXd& m, MatrixXd& result) {
+Eigen::MatrixXd hungarian(MatrixXd& m) {
+  // Pad matrix, if necessary
+  int n_rows = m.rows();
+  int n_cols = m.cols();
+  if (n_rows != n_cols) {
+    float max_elem = m.maxCoeff(); // find the max element
+    int dim = std::max(n_rows, n_cols); // find the dimension for the new, square matrix
+    m.conservativeResize(dim,dim);
+    // fill the matrix with the elements from temp and pad with max element
+    for (int i=0; i < dim; i++) {
+      for (int j=0; j < dim; j++) {
+        if (i >= n_rows || j >= n_cols) m(i,j) = max_elem;
+      }
+    }
+  }
+
+  // Create zero result matrix of the correct size
+  MatrixXd result = MatrixXd::Zero(m.rows(), m.cols());
+
   MatrixXd n = m; // make a copy of m for reducing
   int dim = n.rows(); // dimension of matrix, used for checking if we've reduced
                       // the matrix enough yet
@@ -137,7 +157,7 @@ void hungarian(MatrixXd& m, MatrixXd& result) {
     }
     if (colCover.sum() == dim) {
       result = stars;
-      return;
+      return result;
     }
     
     // Step 4
